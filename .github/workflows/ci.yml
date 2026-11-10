@@ -2,9 +2,13 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
   push:
-    branches: [main]
+    branches:
+      - main
+      - dev
+
 
 # Aucun droit d'écriture nécessaire pour cette CI.
 permissions:
