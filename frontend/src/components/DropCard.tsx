@@ -8,7 +8,7 @@ interface DropCardProps {
 
 export function DropCard({ drop }: DropCardProps) {
   return (
-    <article className="drop-card">
+    <article className="drop-card" data-testid="drop-card">
       <a href={`/drops/${drop.id}`} className="drop-card-link">
         <h2>{drop.product}</h2>
       </a>
