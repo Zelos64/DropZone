@@ -3,9 +3,7 @@ from datetime import UTC, datetime, timedelta
 from fastapi.testclient import TestClient
 
 
-def test_order_decrements_stock(
-    client: TestClient, make_drop
-) -> None:
+def test_order_decrements_stock(client: TestClient, make_drop) -> None:
     drop = make_drop(stock=5)
 
     response = client.post(f"/drops/{drop['id']}/orders")
@@ -18,9 +16,7 @@ def test_order_decrements_stock(
     assert updated.json()["remaining"] == 4
 
 
-def test_last_pair_sells_out_drop(
-    client: TestClient, make_drop
-) -> None:
+def test_last_pair_sells_out_drop(client: TestClient, make_drop) -> None:
     drop = make_drop(stock=2)
 
     # Première commande : il reste une paire.
@@ -40,9 +36,7 @@ def test_last_pair_sells_out_drop(
     assert updated["status"] == "sold_out"
 
 
-def test_cannot_order_sold_out_drop(
-    client: TestClient, make_drop
-) -> None:
+def test_cannot_order_sold_out_drop(client: TestClient, make_drop) -> None:
     drop = make_drop(stock=1)
 
     first = client.post(f"/drops/{drop['id']}/orders")
@@ -56,9 +50,7 @@ def test_cannot_order_sold_out_drop(
     assert updated["remaining"] == 0
 
 
-def test_cannot_order_before_drop_opens(
-    client: TestClient, make_drop
-) -> None:
+def test_cannot_order_before_drop_opens(client: TestClient, make_drop) -> None:
     future = datetime.now(UTC) + timedelta(hours=1)
 
     drop = make_drop(

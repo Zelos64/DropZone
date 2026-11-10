@@ -26,7 +26,7 @@ describe('DropCard', () => {
       screen.getByRole('link', { name: 'Air Max 1' }),
     ).toHaveAttribute('href', '/drops/42')
 
-    expect(screen.getByText('180,00 €')).toBeInTheDocument()
+    expect(screen.getByText(/180,00\s*€/)).toBeInTheDocument()
     expect(screen.getByText('3 / 10 paires restantes')).toBeInTheDocument()
     expect(screen.getByText('En vente')).toBeInTheDocument()
   })
