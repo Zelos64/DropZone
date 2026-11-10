@@ -1,23 +1,66 @@
-import { Link } from 'react-router'
-import type { Drop } from '../api'
-import { formatPrice } from '../format'
-import { Countdown } from './Countdown'
-import { StatusBadge } from './StatusBadge'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
+import { describe, expect, it } from 'vitest'
 
-export function DropCard({ drop }: { drop: Drop }) {
-  return (
-    <article className="card" data-testid="drop-card">
-      <header className="card__header">
-        <StatusBadge status={drop.status} />
-        <span className="card__price">{formatPrice(drop.price_cents)}</span>
-      </header>
-      <h2 className="card__title">
-        <Link to={`/drops/${drop.id}`}>{drop.product}</Link>
-      </h2>
-      <p className="card__stock">
-        {drop.remaining} / {drop.stock} paires restantes
-      </p>
-      {drop.status === 'upcoming' && <Countdown opensAt={drop.opens_at} />}
-    </article>
-  )
-}
+import { DropCard } from './DropCard'
+import { makeDrop } from '../test/fixtures'
+
+describe('DropCard', () => {
+  it('displays product, price, remaining stock and status', () => {
+    const drop = makeDrop({
+      id: 42,
+      product: 'Air Max 1',
+      price_cents: 18000,
+      stock: 10,
+      remaining: 3,
+      status: 'live',
+    })
+
+    render(
+      <MemoryRouter>
+        <DropCard drop={drop} />
+      </MemoryRouter>,
+    )
+
+    expect(
+      screen.getByRole('link', { name: 'Air Max 1' }),
+    ).toHaveAttribute('href', '/drops/42')
+
+    expect(screen.getByText('180,00 €')).toBeInTheDocument()
+
+    expect(
+      screen.getByText('3 / 10 paires restantes'),
+    ).toBeInTheDocument()
+
+    expect(screen.getByText('En vente')).toBeInTheDocument()
+  })
+
+  it('displays the upcoming status', () => {
+    const drop = makeDrop({
+      status: 'upcoming',
+    })
+
+    render(
+      <MemoryRouter>
+        <DropCard drop={drop} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('À venir')).toBeInTheDocument()
+  })
+
+  it('displays the sold out status', () => {
+    const drop = makeDrop({
+      remaining: 0,
+      status: 'sold_out',
+    })
+
+    render(
+      <MemoryRouter>
+        <DropCard drop={drop} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Épuisé')).toBeInTheDocument()
+  })
+})
