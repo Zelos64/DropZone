@@ -126,4 +126,4 @@ Le détail des consignes est dans la fiche **« TP DropZone »**. En résumé :
 
 ## Licence
 
-MIT.
+MIT
