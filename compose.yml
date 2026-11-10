@@ -1,3 +1,4 @@
+
 services:
   db:
     image: postgres:16-alpine
@@ -32,6 +33,16 @@ services:
         condition: service_healthy
     ports:
       - "${API_PORT:-8000}:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   front:
     build:
@@ -41,9 +52,21 @@ services:
         VITE_API_URL: ${VITE_API_URL:-/api}
     restart: unless-stopped
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "${FRONT_PORT:-8080}:8080"
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -q
+        - --spider
+        - http://127.0.0.1:8080/
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 volumes:
   postgres_data:

@@ -1,66 +1,27 @@
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import type { Drop } from '../api'
+import { formatPrice } from '../format'
+import { StatusBadge } from './StatusBadge'
 
-import { DropCard } from './DropCard'
-import { makeDrop } from '../test/fixtures'
+interface DropCardProps {
+  drop: Drop
+}
 
-describe('DropCard', () => {
-  it('displays product, price, remaining stock and status', () => {
-    const drop = makeDrop({
-      id: 42,
-      product: 'Air Max 1',
-      price_cents: 18000,
-      stock: 10,
-      remaining: 3,
-      status: 'live',
-    })
+export function DropCard({ drop }: DropCardProps) {
+  return (
+    <article className="drop-card">
+      <a href={`/drops/${drop.id}`} className="drop-card-link">
+        <h2>{drop.product}</h2>
+      </a>
 
-    render(
-      <MemoryRouter>
-        <DropCard drop={drop} />
-      </MemoryRouter>,
-    )
+      <p className="drop-card-price">
+        {formatPrice(drop.price_cents)}
+      </p>
 
-    expect(
-      screen.getByRole('link', { name: 'Air Max 1' }),
-    ).toHaveAttribute('href', '/drops/42')
+      <p className="drop-card-stock">
+        {drop.remaining} / {drop.stock} paires restantes
+      </p>
 
-    expect(screen.getByText('180,00 €')).toBeInTheDocument()
-
-    expect(
-      screen.getByText('3 / 10 paires restantes'),
-    ).toBeInTheDocument()
-
-    expect(screen.getByText('En vente')).toBeInTheDocument()
-  })
-
-  it('displays the upcoming status', () => {
-    const drop = makeDrop({
-      status: 'upcoming',
-    })
-
-    render(
-      <MemoryRouter>
-        <DropCard drop={drop} />
-      </MemoryRouter>,
-    )
-
-    expect(screen.getByText('À venir')).toBeInTheDocument()
-  })
-
-  it('displays the sold out status', () => {
-    const drop = makeDrop({
-      remaining: 0,
-      status: 'sold_out',
-    })
-
-    render(
-      <MemoryRouter>
-        <DropCard drop={drop} />
-      </MemoryRouter>,
-    )
-
-    expect(screen.getByText('Épuisé')).toBeInTheDocument()
-  })
-})
+      <StatusBadge status={drop.status} />
+    </article>
+  )
+}
